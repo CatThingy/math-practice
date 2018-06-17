@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Integer Math Practice</title>
+	<style>
+		.gameArea{
+			display:none;
+		}
+		#test{
+			border-style:ridge;
+			border-color:red;
+			border-width:7px;
+		}
+		p{
+			font-size:120%
+		}
+		button{
+			font-size:120%
+		}
+		input{
+			font-size:110%
+		}
+		.instruct{
+			display:inline;
+		}
+		#diff{
+			width:50px;
+		}
+		#roundNum{
+			width:55px;
+		}
+		#p1col{
+			background-color:white;
+			border-style:none;
+		}
+		#p2col{
+			background-color:white;
+			border-style:none;
+		}
+		.gameOver{
+			display:none;
+			font-size:150%;
+		}
+	</style>
+</head>
+<body>
+<p class="instruct">Instructions:<br class="instruct">Choose either Practice or Against a Friend. Then,<br class="instruct">answer each question and click the Submit<br class="instruct">Answer button. If you are playing against a<br class="instruct">friend, then it's their turn to answer the question.<br class="instruct">The border of the box indicates which player's <br class="instruct">turn it is.</p><br class="instruct">
+<button class="instruct" onclick="startGame(1)">Practice</button>
+<button class="instruct" onclick="startGame(2)">Against a Friend</button><br class="instruct">
+<p class="gameArea">P1 Score:</p><p class="gameArea" id="p1">0/0</p><br class="gameArea">
+<p class="gameArea"id="p2id">P2 Score:</p><p class="gameArea" id="p2">0/0</p><br class="gameArea">
+<p class="gameArea" id="question"></p><br class="gameArea">
+<input class="gameArea"type="textarea" id="test"></input> <button class="gameArea" onclick="submit()">Submit Answer</button>
+<p class="instruct">P1 Colour:</p><input type="color" class="instruct" value="#ff0000" id="p1col"></input><br class="instruct">
+<p class="instruct">P2 Colour:</p><input type="color" class="instruct" value="#0000ff" id="p2col"></input><br class="instruct">
+<p class="instruct">Random Numbers up to</p><input class="instruct" type="textarea" id="diff" value="15"></input><br class="instruct">
+<p class="instruct">Amount of rounds(only applies to multiplayer):</p><input class="instruct" type="textarea" id="roundNum" value="Infinity"></input>
+<p class="gameOver" id="winIndic"></p>
+<button class="gameOver" onclick="reload()">Restart</button>
+<script>
+	var turnCount=0;
+	var turns;
+	var gameState=0;
+	var p1=0;
+	var p2=0;
+	var turn=0;
+	var num1;
+	var num2;
+	var operator;
+	var q1amount=0;
+	var q2amount=0;
+	var p1colour;
+	var p2colour;
+	var diff;
+	var roundLim;
+	function submit(){
+		if(turn==0){
+			switch(operator){ 
+				case 0: 
+					if(document.getElementById("test").value==Number(num1)+Number(num2)){
+						p1+=1;
+					}
+					else{
+						alert("Sorry! The answer is "+(Number(num1)+Number(num2)));
+					}
+					break;
+				case 1:
+					if(document.getElementById("test").value==Number(num1)-Number(num2)){ 
+						p1+=1;
+					} 
+					else{
+						alert("Sorry! The answer is "+(Number(num1)-Number(num2)));
+					} 
+					break;
+				case 2: 
+					if(document.getElementById("test").value==Number(num1)*Number(num2)){
+						p1+=1;
+					} 
+					else{
+						alert("Sorry! The answer is "+(Number(num1)*Number(num2)));
+					} 
+					break;
+				case 3: 
+					if(document.getElementById("test").value==Number(num1)/Number(num2)){
+						p1+=1;
+					} 
+					else{ 
+						alert("Sorry! The answer is "+(Number(num1)/Number(num2)));
+						} 
+					break;
+			} 
+			if(gameState==2){
+				turn=1;
+				document.getElementById("test").style.borderColor=p2colour;
+			} 
+			genQuestion();
+			document.getElementById("test").value="";
+			q1amount+=1;
+			document.getElementById("p1").innerHTML=p1+"/"+q1amount;
+			} 
+		else if(turn==1){ 
+			switch(operator){ 
+				case 0: 
+					if(document.getElementById("test").value==Number(num1)+Number(num2)){
+						p2+=1;
+					}
+					else{
+						alert("Sorry! The answer is "+(Number(num1)+Number(num2)));
+					}
+					break;
+				case 1:
+					if(document.getElementById("test").value==Number(num1)-Number(num2)){ 
+						p2+=1;
+					} 
+					else{
+						alert("Sorry! The answer is "+(Number(num1)-Number(num2)));
+					} 
+					break;
+				case 2: 
+					if(document.getElementById("test").value==Number(num1)*Number(num2)){
+						p2+=1;
+					} 
+					else{
+						alert("Sorry! The answer is "+(Number(num1)*Number(num2)));
+					} 
+					break;
+				case 3: 
+					if(document.getElementById("test").value==Number(num1)/Number(num2)){
+						p2+=1;
+					} 
+					else{ 
+						alert("Sorry! The answer is "+(Number(num1)/Number(num2)));
+						} 
+					break;
+			}
+			turn=0;
+			document.getElementById("test").value="";
+			document.getElementById("test").style.borderColor=p1colour;
+			q2amount+=1;
+			document.getElementById("p2").innerHTML=p2+"/"+q2amount;
+			if(q2amount>=roundLim){
+				endGame();
+			}
+			genQuestion();
+		} 
+	} 
+	function genQuestion(){ 
+		var r=Math.random();
+		if(r<0.20){ 
+			operator=0;
+		} 
+		else if(r<0.4){ 
+			operator=1;
+		} 
+		else if(r<0.7){
+			operator=2;
+		} 
+		else{
+			operator=3;
+		} 
+		var num1ValAssign=Math.random();
+		if(num1ValAssign<0.5){ 
+			num1=Math.ceil(Math.random()*(diff*-1));
+		} 
+		else if(num1ValAssign>=0.5){
+			num1=Math.ceil(Math.random()*diff);
+		} 
+		var num2ValAssign=Math.random();
+		if(operator!=3){ 
+			if(num2ValAssign>0.5){ 
+				num2=Math.ceil(Math.random()*(diff*-1));
+			} 
+			else{
+				num2=Math.ceil(Math.random()*diff);
+			} 
+		} 
+		else{
+			if(num2ValAssign<0.5){
+				if(num1<1){
+					num1+=1;
+				} 
+				num2=num1;
+				num1=num2*Math.ceil(Math.random()*diff);
+			} 
+			else{
+			num2=num1;
+			num1=num2*Math.ceil(Math.random()*(diff*-1));
+			}
+		} 
+		var open1;
+		var close1;
+		var open2;
+		var close2;
+		if(num1<0){ 
+			open1="(";
+			close1=")";
+		} 
+		else{
+			open1="";
+			close1="";
+		} 
+		if(num2<0){ 
+			open2="(";
+			close2=")";
+		} 
+		else{
+			open2="";
+			close2="";
+		} 
+		if(operator==0){
+			document.getElementById("question").innerHTML=open1+num1+close1+"+"+open2+num2+close2+"=" 
+		} 
+		else if(operator==1){
+			document.getElementById("question").innerHTML=open1+num1+close1+"-"+open2+num2+close2+"=" 
+		} 
+		else if(operator==2){ 
+			document.getElementById("question").innerHTML=open1+num1+close1+"&times;"+open2+num2+close2+"=" 
+		} 
+		else if(operator==3){
+			document.getElementById("question").innerHTML=open1+num1+close1+"&divide;"+open2+num2+close2+"=" 
+		} 
+		if(operator==3&&num1==0&&num2==0){
+			genQuestion();
+		} 
+	}
+	function startGame(playerCount){
+		var temp=document.getElementsByClassName("gameArea");
+		for(var i=0;i<temp.length;i++){
+			temp[i].style.display="inline";
+		} 
+		temp=document.getElementsByClassName("instruct");
+		for(var i=0;i<temp.length;i++){ 
+			temp[i].style.display="none";
+		} 
+		if(playerCount==1){ 
+			document.getElementById("p2").style.display="none";
+			document.getElementById("p2id").style.display="none";
+		} 
+		else{ 
+			gameState=2;
+		} 
+		p1colour=document.getElementById("p1col").value;
+		p2colour=document.getElementById("p2col").value;
+		document.getElementById("test").style.borderColor=p1colour;
+		diff=document.getElementById("diff").value;
+		genQuestion();
+		roundLim=document.getElementById("roundNum").value;
+	}
+	function endGame(){
+		var temp=document.getElementsByClassName("gameOver");
+		for(var i=0;i<temp.length;i++){
+			temp[i].style.display="inline";
+		}
+		temp=document.getElementsByClassName("gameArea");
+		for(var i=0;i<temp.length;i++){
+			temp[i].style.display="none";
+		}
+		if(p1>p2){
+			document.getElementById("winIndic").innerHTML="P1 Wins!"
+			document.getElementById("winIndic").style.color=p1colour;
+		}
+		else if(p2>p1){
+			document.getElementById("winIndic").innerHTML="P2 Wins!"
+			document.getElementById("winIndic").style.color=p2colour;
+		}
+		else{
+			document.getElementById("winIndic").innerHTML="Tie Game!"
+			document.getElementById("winIndic").style.color=mixColour(p1colour,p2colour);
+		}
+	}
+	function mixColour(col1,col2){
+			var temp1=col1.split("");
+			temp1.splice(0,1);
+			temp1[0]=temp1[0].concat(temp1[1]);
+			temp1.splice(1,1);
+			temp1[1]=temp1[1].concat(temp1[2]);
+			temp1.splice(2,1);
+			temp1[2]=temp1[2].concat(temp1[3]);
+			temp1.splice(3,1);
+			for(var i=0;i<temp1.length;i++){
+				temp1[i]=parseInt(temp1[i],16);
+			}
+			var temp2=col2.split("");
+			temp2.splice(0,1);
+			temp2[0]=temp2[0].concat(temp2[1]);
+			temp2.splice(1,1);
+			temp2[1]=temp2[1].concat(temp2[2]);
+			temp2.splice(2,1);
+			temp2[2]=temp2[2].concat(temp2[3]);
+			temp2.splice(3,1);
+			for(var i=0;i<temp2.length;i++){
+				temp2[i]=parseInt(temp2[i],16);
+			}
+			var temp3=[temp1[0]+temp2[0],temp1[1]+temp2[1],temp1[2]+temp2[2]];
+			for(var i=0;i<temp3.length;i++){
+				temp3[i]/=2;
+				temp3[i]=Math.floor(temp3[i]);
+				if(temp3[i].toString().length<2){
+					temp3[i]="0"+temp3[i].toString();
+				}
+			}
+			var result="#"+temp3[0].toString(16)+temp3[1].toString(16)+temp3[2].toString(16);
+			return result;
+		}
+	function reload(){
+		location.reload(true);
+	}
+	</script>
+</body>
+</html>
